@@ -1,0 +1,60 @@
+/* src/components/Navbar.css */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E7E5E4;
+  box-shadow: 0 2px 4px rgba(28, 25, 23, 0.03);
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #EA580C;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Estilo para tu foto de perfil real */
+.navbar-profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #EA580C;
+}
+
+.navbar-user-name {
+  font-weight: 600;
+  color: #1C1917;
+  font-size: 0.95rem;
+}
+
+.navbar-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5.rem 1rem;
+  background-color: #EA580C;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.15);
+  transition: background-color 0.2s;
+}
+
+.navbar-logout-btn:hover {
+  background-color: #C2410C;
+}
