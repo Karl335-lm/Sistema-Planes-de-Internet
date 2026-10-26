@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { ClientesPage } from './ClientesPage';
+import { ConfiguracionPage } from './ConfiguracionPage';
 
 export function DashboardPage({ user, onLogout }) {
   // Pestaña activa por defecto: Inicio / Planes
@@ -110,7 +111,7 @@ export function DashboardPage({ user, onLogout }) {
 
           {/* OTRAS PESTAÑAS */}
           {activeTab === 'reportes' && <div><h2>Sección de Reportes</h2></div>}
-          {activeTab === 'configuracion' && <div><h2>Configuración</h2></div>}
+          {activeTab === 'configuracion' && <ConfiguracionPage />}
         </main>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   fetchClientes, 
@@ -11,42 +11,49 @@ import { ClienteModal } from '../components/ClienteModal';
 export const ClientesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Sincronización con Parámetros URL
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || '10', 10);
 
-  // Estados locales
   const [clientes, setClientes] = useState([]);
+  const [allClientes, setAllClientes] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Estados Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
 
-  // Cargar lista de clientes
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchClientes({ search, status, page, limit });
-        setClientes(data.clientes);
-        setTotal(data.total);
-      } catch (err) {
-        setError('Error al cargar la lista de clientes');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Cargar datos sin acumular o concatenar estados previos
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchClientes({ search, status, page, limit });
+      setClientes(data.clientes);
+      setTotal(data.total);
 
-    loadData();
+      const localData = JSON.parse(localStorage.getItem('enlasate_clientes') || '[]');
+      setAllClientes(localData);
+    } catch (err) {
+      setError('Error al cargar clientes');
+    } finally {
+      setLoading(false);
+    }
   }, [search, status, page, limit]);
 
-  // Helper para URL
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Cálculos dinámicos
+  const totalRegistrados = allClientes.length;
+  const clientesActivos = allClientes.filter(c => c.status === 'Activo').length;
+  const indiceActividad = totalRegistrados > 0 
+    ? ((clientesActivos / totalRegistrados) * 100).toFixed(1) 
+    : '0.0';
+
   const updateUrlParams = (newParams) => {
     const updated = new URLSearchParams(searchParams);
     Object.entries(newParams).forEach(([key, value]) => {
@@ -56,12 +63,10 @@ export const ClientesPage = () => {
     setSearchParams(updated);
   };
 
-  // Handlers de Filtros
   const handleSearchChange = (e) => updateUrlParams({ search: e.target.value, page: 1 });
   const handleStatusChange = (e) => updateUrlParams({ status: e.target.value, page: 1 });
   const handlePageChange = (newPage) => updateUrlParams({ page: newPage });
 
-  // Operaciones CRUD (Fase 3B)
   const handleOpenAdd = () => {
     setEditingCliente(null);
     setIsModalOpen(true);
@@ -74,17 +79,17 @@ export const ClientesPage = () => {
 
   const handleSave = async (formData) => {
     if (editingCliente) {
-      if (!window.confirm('¿Deseas guardar los cambios de este cliente?')) return;
+      if (!window.confirm('¿Deseas guardar los cambios?')) return;
       try {
         await updateCliente(editingCliente.id, formData);
-        setClientes(prev => prev.map(c => c.id === editingCliente.id ? { ...c, ...formData } : c));
+        await loadData();
       } catch (err) {
         alert('Error al actualizar cliente');
       }
     } else {
       try {
-        const newCliente = await createCliente(formData);
-        setClientes(prev => [newCliente, ...prev]);
+        await createCliente(formData);
+        await loadData();
       } catch (err) {
         alert('Error al registrar cliente');
       }
@@ -95,7 +100,7 @@ export const ClientesPage = () => {
     if (!window.confirm('¿Estás seguro de que deseas eliminar este cliente?')) return;
     try {
       await deleteCliente(id);
-      setClientes(prev => prev.filter(c => c.id !== id));
+      await loadData();
     } catch (err) {
       alert('Error al eliminar cliente');
     }
@@ -105,32 +110,31 @@ export const ClientesPage = () => {
 
   return (
     <div style={figmaStyles.container}>
-      {/* 1. TARJETAS DE MÉTRICAS (KPIS) COMO EN FIGMA */}
+      {/* TARJETAS DE MÉTRICAS */}
       <div style={figmaStyles.kpiGrid}>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>2,846</h2>
+          <h2 style={figmaStyles.kpiValue}>{totalRegistrados}</h2>
           <p style={figmaStyles.kpiLabel}>Clientes registrados</p>
         </div>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>1,560</h2>
+          <h2 style={figmaStyles.kpiValue}>{clientesActivos}</h2>
           <p style={figmaStyles.kpiLabel}>Clientes activos</p>
         </div>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>500</h2>
+          <h2 style={figmaStyles.kpiValue}>{totalRegistrados}</h2>
           <p style={figmaStyles.kpiLabel}>Registros este mes</p>
         </div>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>95.0%</h2>
+          <h2 style={figmaStyles.kpiValue}>{indiceActividad}%</h2>
           <p style={figmaStyles.kpiLabel}>Índice de actividad</p>
         </div>
       </div>
 
-      {/* 2. SECCIÓN PRINCIPAL: DIRECTORIO DE CLIENTES */}
+      {/* DIRECTORIO */}
       <div style={figmaStyles.contentCard}>
         <h2 style={figmaStyles.sectionTitle}>Directorio de Clientes</h2>
         <p style={figmaStyles.sectionSubtitle}>Consulta, filtra y administra los registros del sistema</p>
 
-        {/* BARRA DE BÚSQUEDA Y FILTROS */}
         <div style={figmaStyles.filterRow}>
           <input
             type="text"
@@ -146,20 +150,14 @@ export const ClientesPage = () => {
             <option value="Inactivo">Inactivo</option>
           </select>
 
-          <select defaultValue="" style={figmaStyles.filterSelect}>
-            <option value="">Todos los roles</option>
-          </select>
-
           <button onClick={handleOpenAdd} style={figmaStyles.btnExport}>
             + Agregar Cliente
           </button>
         </div>
 
-        {/* INDICADOR DE CARGA Y ERROR */}
         {loading && <p style={{ textAlign: 'center', color: '#64748b' }}>Cargando clientes...</p>}
         {error && <p style={{ textAlign: 'center', color: '#dc2626' }}>{error}</p>}
 
-        {/* TABLA DE CLIENTES (FIGMA) */}
         {!loading && !error && (
           <>
             <table style={figmaStyles.table}>
@@ -198,7 +196,6 @@ export const ClientesPage = () => {
               </tbody>
             </table>
 
-            {/* CONTROLES DE PAGINACIÓN */}
             <div style={figmaStyles.pagination}>
               <button 
                 onClick={() => handlePageChange(page - 1)} 
