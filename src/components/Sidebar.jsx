@@ -1,11 +1,11 @@
 import { Home, Users, FileText, Settings, Wifi } from 'lucide-react';
 
-export function Sidebar() {
+export function Sidebar({ activeTab, setActiveTab }) {
   const menuItems = [
-    { name: 'Inicio / Planes', icon: Home, active: true },
-    { name: 'Clientes', icon: Users, active: false },
-    { name: 'Reportes', icon: FileText, active: false },
-    { name: 'Configuración', icon: Settings, active: false },
+    { id: 'planes', name: 'Inicio / Planes', icon: Home },
+    { id: 'clientes', name: 'Clientes', icon: Users },
+    { id: 'reportes', name: 'Reportes', icon: FileText },
+    { id: 'configuracion', name: 'Configuración', icon: Settings },
   ];
 
   return (
@@ -21,30 +21,35 @@ export function Sidebar() {
     }}>
       <div>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {menuItems.map((item, index) => {
+          {menuItems.map((item) => {
             const Icon = item.icon;
+            const isActive = activeTab === item.id;
+
             return (
-              <li key={index} style={{ marginBottom: '0.5rem' }}>
-                <a
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
+              <li key={item.id} style={{ marginBottom: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(item.id)}
                   style={{
+                    width: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
                     borderRadius: '8px',
-                    color: item.active ? '#EA580C' : '#44403C',
-                    backgroundColor: item.active ? '#FFF7ED' : 'transparent',
-                    textDecoration: 'none',
-                    fontWeight: item.active ? 'bold' : '500',
+                    color: isActive ? '#EA580C' : '#44403C',
+                    backgroundColor: isActive ? '#FFF7ED' : 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: isActive ? 'bold' : '500',
                     fontSize: '0.95rem',
-                    transition: '0.2s'
+                    transition: '0.2s',
+                    textAlign: 'left'
                   }}
                 >
-                  <Icon size={18} color={item.active ? '#EA580C' : '#78716C'} />
+                  <Icon size={18} color={isActive ? '#EA580C' : '#78716C'} />
                   {item.name}
-                </a>
+                </button>
               </li>
             );
           })}
