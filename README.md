@@ -1,60 +1,178 @@
-# t3_act8_eqXX - Sistema de Planes de Internet
+
+
+# Sistema de Planes de Internet
+
+Aplicación web desarrollada con React y Vite para la gestión de clientes de una empresa proveedora de servicios de Internet. El sistema permite consultar información, realizar búsquedas, filtrar registros y ejecutar operaciones CRUD mediante una API REST.
 
 ## Integrantes
-- [Tu nombre completo] - Fases 1, 2 y 4
-- [Nombre de tu compañera] - Fase 3
 
-# Sistema de Clientes de Internet - t3_act8_eq16
+- Martínez Bautista Karla
+- Ruiz Jiménez Erandi Camila
 
-## Integrantes
-- Martinez Bautista Karla
-- Ruiz Jimenez Erandi Camila
+## Objetivo del proyecto
 
+Desarrollar una aplicación web que facilite la administración de clientes de una empresa de servicios de Internet mediante una interfaz intuitiva y funcional, incorporando autenticación, búsqueda, filtros, paginación y operaciones para agregar, editar y eliminar registros.
 
-## API elegida
-**DummyJSON Users** - https://dummyjson.com/users
+## API seleccionada
 
+**DummyJSON Users**
 
-Se eligió esta API porque el sistema es de gestión de clientes, y DummyJSON Users
-permite simular un directorio de clientes con paginación real (`limit`/`skip`),
-búsqueda (`q`) y operaciones CRUD (`POST/PUT/DELETE`).
+Documentación: https://dummyjson.com/users
 
-## Proyecto desplegado
-http://IP_DE_TU_VPS/t3_act8_eqXX
+Se seleccionó esta API porque permite simular la gestión de clientes mediante información de usuarios. Sus funcionalidades de búsqueda, paginación y operaciones CRUD se adaptan a los requerimientos del proyecto.
 
-## Tecnologías
-- React + Vite
-- React Router DOM
-- Lucide React (iconos)
-- DummyJSON (auth + users)
+Los datos obtenidos se adaptaron al contexto de una empresa de Internet. Por ejemplo, los campos `firstName` y `lastName` se utilizan para representar el nombre del cliente, mientras que `address.city` permite mostrar su ubicación.
 
-## Instalación local
-```bash
-npm install
-npm run dev
-
-**¿Por qué elegimos esta API?**
-Nuestro sistema se trata de una empresa de internet, por lo que necesitábamos gestionar **clientes**, por lo tanto, DummyJSON tiene un endpoint específico de usuarios (`/users`) que nos vino perfecto. Nos permitió adaptar los campos (como `firstName` y `lastName` a "Nombre", o `address.city` a "Colonia") para que todo cuadrara con nuestro diseño. Además, nos daba las herramientas justas que se nos solicitaba: nos dejó simular el inicio de sesión (auth), nos permitió hacer la paginación real de la tabla (usando límites y saltos), la búsqueda por texto, y nos dejó practicar las peticiones `POST`, `PUT` y `DELETE` para el CRUD.
-
-## Proyecto desplegado en AWS
-El proyecto se encuentra desplegado en una instancia EC2 de Amazon Web Services.
-**Enlace:** http://18.218.44.223/t3_act8_eq16/
+La API también permite realizar solicitudes HTTP para consultar información y simular operaciones de creación, actualización y eliminación de registros.
 
 ## Tecnologías utilizadas
-- React + Vite
-- React Router DOM (para el manejo de rutas y la URL con la paginación)
-- Lucide React (iconos)
-- DummyJSON (API de autenticación y datos)
-- Nginx (Servidor web en AWS EC2)
 
+| Tecnología | Descripción |
+|---|---|
+| React | Desarrollo de la interfaz mediante componentes. |
+| Vite | Herramienta para el desarrollo y la compilación del proyecto. |
+| React Router DOM | Administración de rutas y navegación. |
+| Lucide React | Biblioteca de iconos para la interfaz. |
+| DummyJSON | API para autenticación y consulta de usuarios. |
+| Nginx | Servidor web utilizado para el despliegue. |
+| Amazon EC2 | Servicio de alojamiento de la aplicación en la nube. |
+
+## Funcionalidades principales
+
+- Inicio de sesión mediante la API de autenticación de DummyJSON.
+- Visualización de información de los clientes.
+- Búsqueda de registros mediante texto.
+- Aplicación de filtros para organizar la información.
+- Paginación de registros y selección de la cantidad de elementos por página.
+- Sincronización de la paginación con los parámetros de la URL.
+- Registro de nuevos clientes mediante formularios modales.
+- Edición de registros con confirmación.
+- Eliminación de registros con confirmación.
+- Actualización de la interfaz después de realizar operaciones.
+- Navegación mediante un menú lateral y una barra superior.
+
+## Operaciones CRUD
+
+El sistema utiliza solicitudes HTTP para simular las operaciones básicas de administración de clientes.
+
+| Método HTTP | Operación | Descripción |
+|---|---|---|
+| GET | Consultar | Obtiene la información de los usuarios. |
+| POST | Crear | Simula el registro de un nuevo usuario. |
+| PUT | Actualizar | Simula la modificación de un usuario existente. |
+| DELETE | Eliminar | Simula la eliminación de un usuario. |
+
+Las operaciones de escritura de DummyJSON son simuladas por la API y no representan cambios permanentes en una base de datos propia.
+
+## Paginación
+
+La aplicación permite navegar entre páginas y seleccionar la cantidad de registros que se muestran. Para ello, se utilizan parámetros en la URL que permiten conservar la página actual y el tamaño de la página.
+
+Ejemplo:
+
+```text
+?page=2&limit=20
+```
+
+La API también admite los parámetros `limit` y `skip` para controlar la cantidad de registros devueltos y el desplazamiento de los resultados.
+
+Ejemplo de consulta:
+
+```text
+https://dummyjson.com/users?limit=10&skip=0
+```
+
+## Instalación y ejecución local
+
+### Requisitos previos
+
+- Node.js.
+- npm.
+- Git.
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/Karl335-lm/Sistema-Planes-de-Internet.git
+```
+
+### 2. Acceder al directorio del proyecto
+
+```bash
+cd Sistema-Planes-de-Internet
+```
+
+### 3. Instalar las dependencias
+
+```bash
+npm install
+```
+
+### 4. Ejecutar la aplicación
+
+```bash
+npm run dev
+```
+
+Una vez iniciado el servidor de desarrollo, Vite mostrará en la terminal la dirección local para acceder a la aplicación desde el navegador.
+
+La dirección predeterminada suele ser:
+
+```text
+http://localhost:5173/
+```
+
+Si la aplicación se encuentra dentro de una subcarpeta, es necesario acceder primero al directorio que contiene el archivo `package.json`.
+
+## Diseño de la interfaz
+
+Para el diseño visual se tomó como referencia el prototipo elaborado en Figma durante la actividad anterior. Se conservaron elementos como la pantalla de inicio de sesión, el menú lateral, la barra de navegación y la tabla principal de clientes.
+
+La interfaz se organizó mediante componentes reutilizables para facilitar el mantenimiento y la integración de las distintas funcionalidades.
 
 ## Resumen del desarrollo
 
-El diseño (Figma): Todo comenzó con el prototipo desarrollado en la Actividad 7. Se tomó como base esa paleta de colores y la distribución visual (login, menú lateral y la tabla) para maquetar la interfaz en React.
+### Fases 1 y 2. Autenticación e interfaz principal
 
-El Login (Fase 1 y 2): Se construyó el formulario y se conectó a la API de autenticación de DummyJSON. Se implementaron validaciones para asegurar que los campos no estuvieran vacíos y, al verificar que el usuario existiera, sus datos (incluida su foto de perfil) se guardaron en el estado global (useState). Posteriormente, se creó el "esqueleto" del sistema con el Sidebar y Navbar, asegurando mediante una condición de estado que, si alguien intentaba ver el sistema sin iniciar sesión, fuera redirigido automáticamente a la pantalla de login.
+Se desarrolló el formulario de inicio de sesión y se integró la API de autenticación de DummyJSON. Se incorporaron validaciones para los campos y el manejo del estado de la sesión.
 
-La Tabla y el CRUD (Fase 3): Esta fue la fase más compleja. La tabla se conectó a la API de usuarios. Se implementaron filtros por texto y por estado, y la paginación se configuró para que se reflejara en la URL (por ejemplo, ?page=2&limit=20), permitiendo que el botón de "atrás" del navegador funcionara correctamente. También se agregaron modales para agregar y editar clientes, incluyendo ventanas de confirmación antes de guardar o borrar, y logrando que la vista se actualizara en tiempo real tras cada operación.
+Posteriormente, se construyó la estructura principal de la aplicación mediante componentes de React, incluyendo el menú lateral y la barra superior. También se implementó el control de acceso a las pantallas según el estado de autenticación.
 
-El Despliegue (Fase 4): Finalmente, se creó una máquina virtual (instancia EC2) en AWS con Amazon Linux. Se instaló Nginx y se subió la carpeta de producción (dist) generada por Vite. Se configuró la ruta /t3_act8_eq16/ en el servidor para que todo el sistema funcionara correctamente en la nube.
+### Fase 3. Tabla, filtros, paginación y CRUD
 
+Se conectó la tabla con la API de usuarios para mostrar la información de los clientes. Se implementaron la búsqueda por texto, los filtros y la paginación mediante parámetros en la URL.
+
+También se desarrollaron formularios modales para agregar y editar registros, así como mecanismos de confirmación antes de modificar o eliminar información. Finalmente, se incorporó la actualización de la interfaz después de realizar las operaciones.
+
+### Fase 4. Despliegue
+
+La aplicación se desplegó en una instancia EC2 de Amazon Web Services utilizando Amazon Linux y Nginx.
+
+El proceso incluyó la generación de los archivos de producción mediante Vite, la transferencia de la carpeta `dist` al servidor y la configuración de Nginx para publicar la aplicación en la ruta correspondiente.
+
+## Proyecto desplegado
+
+La aplicación se encuentra alojada en una instancia EC2 de Amazon Web Services.
+
+**Enlace de acceso:** http://18.218.44.223/t3_act8_eq16/
+
+El acceso depende de que la instancia esté activa y de que el servidor y las reglas de red estén configurados correctamente.
+
+## Aprendizajes obtenidos
+
+Durante el desarrollo del proyecto se reforzaron los conocimientos relacionados con:
+
+- Desarrollo de interfaces con React.
+- Creación y reutilización de componentes.
+- Manejo del estado mediante `useState`.
+- Consumo de API REST.
+- Implementación de formularios y validaciones.
+- Búsqueda, filtros y paginación.
+- Administración de rutas y parámetros de URL.
+- Implementación de operaciones CRUD.
+- Compilación de aplicaciones con Vite.
+- Despliegue de aplicaciones web en AWS EC2 mediante Nginx.
+
+## Licencia
+
+Proyecto desarrollado con fines académicos.
