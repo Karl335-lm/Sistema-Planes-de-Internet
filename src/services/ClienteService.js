@@ -2,111 +2,127 @@
 
 const API_BASE_URL = 'https://dummyjson.com/users';
 
-const INITIAL_CLIENTS = [
-  { id: '0001', name: 'Ana Lopez', colonia: 'El Paraíso', createdAt: '14 oct, 2026', status: 'Activo' },
-  { id: '0002', name: 'Carlos Pérez', colonia: 'Satelite', createdAt: '30 sep, 2025', status: 'Activo' },
-  { id: '0003', name: 'María Ruiz', colonia: 'Manantial', createdAt: '20 dic, 2024', status: 'Inactivo' }
-];
+const mapUserToCliente = (user) => ({
+  id: user.id,
+  name: `${user.firstName} ${user.lastName}`,
+  colonia: user.address?.city || 'Sin colonia',
+  createdAt: new Date().toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }),
+  status: user.age && user.age > 30 ? 'Activo' : 'Inactivo', // simulado
+  image: user.image,
+});
 
-// Helper para obtener datos limpios y sin duplicados por ID
-const getStoredClients = () => {
-  const localData = localStorage.getItem('enlasate_clientes');
-  if (!localData) {
-    localStorage.setItem('enlasate_clientes', JSON.stringify(INITIAL_CLIENTS));
-    return INITIAL_CLIENTS;
-  }
-  try {
-    const parsed = JSON.parse(localData);
-    // Filtrar posibles duplicados que hayan quedado guardados previamente por ID
-    const unique = Array.from(new Map(parsed.map(item => [item.id, item])).values());
-    return unique;
-  } catch (e) {
-    return INITIAL_CLIENTS;
-  }
-};
-
-const saveStoredClients = (clients) => {
-  localStorage.setItem('enlasate_clientes', JSON.stringify(clients));
-};
+/**
+ * GET: trae usuarios desde la API real con búsqueda y paginación.
+ */
 
 export const fetchClientes = async ({ search = '', status = '', page = 1, limit = 10 }) => {
-  let result = getStoredClients();
+  try {
+    const skip = (page - 1) * limit;
+    const url = search.trim()
+      ? `${API_BASE_URL}/search?q=${encodeURIComponent(search)}&limit=${limit}&skip=${skip}`
+      : `${API_BASE_URL}?limit=${limit}&skip=${skip}`;
 
-  if (search.trim()) {
-    const term = search.toLowerCase();
-    result = result.filter(c => 
-      c.name.toLowerCase().includes(term) || 
-      c.id.includes(term) || 
-      c.colonia.toLowerCase().includes(term)
-    );
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Error al obtener clientes');
+
+    const data = await response.json();
+    let clientes = data.users.map(mapUserToCliente);
+
+    if (status) {
+      clientes = clientes.filter((c) => c.status === status);
+    }
+
+    return {
+      clientes,
+      total: status ? clientes.length : data.total,
+    };
+  } catch (error) {
+    console.error('fetchClientes error:', error);
+    throw new Error('No se pudieron cargar los clientes');
   }
-
-  if (status) {
-    result = result.filter(c => c.status.toLowerCase() === status.toLowerCase());
-  }
-
-  const start = (page - 1) * limit;
-  const paginated = result.slice(start, start + limit);
-
-  return {
-    clientes: paginated,
-    total: result.length
-  };
 };
 
+/**
+ * POST: crea un cliente en la API real 
+ */
 export const createCliente = async (clienteData) => {
-  // Petición HTTP real simulada / dummy
   try {
-    await fetch(`${API_BASE_URL}/add`, {
+    const response = await fetch(`${API_BASE_URL}/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(clienteData)
+      body: JSON.stringify({
+        firstName: clienteData.name,
+        lastName: '',
+        address: { city: clienteData.colonia },
+        age: clienteData.status === 'Activo' ? 35 : 25,
+      }),
     });
-  } catch (e) {
-    console.warn('API add response mock');
+
+    if (!response.ok) throw new Error('Error al crear cliente');
+    const data = await response.json();
+
+    // DummyJSON devuelve el objeto creado con un id nuevo
+    return mapUserToCliente({
+      ...data,
+      firstName: clienteData.name,
+      lastName: '',
+      address: { city: clienteData.colonia },
+      age: clienteData.status === 'Activo' ? 35 : 25,
+    });
+  } catch (error) {
+    console.error('createCliente error:', error);
+    throw new Error('No se pudo crear el cliente');
   }
-
-  const current = getStoredClients();
-  // Asignar ID único basado en timestamp para evitar cualquier duplicado de ID
-  const uniqueId = `00${Date.now().toString().slice(-4)}`;
-
-  const newCliente = {
-    ...clienteData,
-    id: uniqueId,
-    createdAt: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
-  };
-
-  const updated = [newCliente, ...current];
-  saveStoredClients(updated);
-  return newCliente;
 };
 
+/**
+ * PUT: actualiza un cliente en la API real
+ */
 export const updateCliente = async (id, clienteData) => {
   try {
-    await fetch(`${API_BASE_URL}/1`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(clienteData)
+      body: JSON.stringify({
+        firstName: clienteData.name,
+        lastName: '',
+        address: { city: clienteData.colonia },
+        age: clienteData.status === 'Activo' ? 35 : 25,
+      }),
     });
-  } catch (e) {
-    console.warn('API update response mock');
-  }
 
-  const current = getStoredClients();
-  const updated = current.map(c => c.id === id ? { ...c, ...clienteData } : c);
-  saveStoredClients(updated);
-  return { id, ...clienteData };
+    if (!response.ok) throw new Error('Error al actualizar cliente');
+    const data = await response.json();
+
+    return mapUserToCliente({
+      ...data,
+      id,
+      firstName: clienteData.name,
+      lastName: '',
+      address: { city: clienteData.colonia },
+      age: clienteData.status === 'Activo' ? 35 : 25,
+    });
+  } catch (error) {
+    console.error('updateCliente error:', error);
+    throw new Error('No se pudo actualizar el cliente');
+  }
 };
 
+/**
+ * DELETE: elimina un cliente en la API real
+ */
 export const deleteCliente = async (id) => {
   try {
-    await fetch(`${API_BASE_URL}/1`, { method: 'DELETE' });
-  } catch (e) {
-    console.warn('API delete response mock');
+    const response = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
+    if (!response.ok) throw new Error('Error al eliminar cliente');
+    const data = await response.json();
+    return { success: data.isDeleted, id };
+  } catch (error) {
+    console.error('deleteCliente error:', error);
+    throw new Error('No se pudo eliminar el cliente');
   }
-
-  const current = getStoredClients();
-  const updated = current.filter(c => c.id !== id);
-  saveStoredClients(updated);
-  return { success: true, id };
 };

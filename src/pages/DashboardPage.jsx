@@ -24,9 +24,9 @@ export function DashboardPage({ user, onLogout }) {
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <img 
-            src="https://via.placeholder.com/32" 
+            src={user?.image || '/perfil.jpeg'} 
             alt="User avatar" 
-            style={{ borderRadius: '50%', width: '32px', height: '32px' }} 
+            style={{ borderRadius: '50%', width: '32px', height: '32px', objectFit: 'cover' }} 
           />
           <span style={{ fontWeight: '600', color: '#1C1917' }}>{user?.name || 'Emily Johnson'}</span>
           <button 
@@ -58,11 +58,11 @@ export function DashboardPage({ user, onLogout }) {
           {activeTab === 'planes' && (
             <div>
               <div style={{ fontSize: '0.9rem', color: '#78716C', marginBottom: '1rem' }}>
-                🏠 Inicio / <strong>Dashboard</strong>
+                Inicio / <strong>Dashboard</strong>
               </div>
 
               <h1 style={{ fontSize: '1.8rem', color: '#EA580C', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                ¡Bienvenido, {user?.name || 'Emily'}! 👋
+                ¡Bienvenido, {user?.name || 'Emily'}!
               </h1>
 
               <p style={{ color: '#44403C', maxWidth: '900px', lineHeight: '1.5', marginBottom: '2rem' }}>

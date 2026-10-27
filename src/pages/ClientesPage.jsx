@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { 
-  fetchClientes, 
-  createCliente, 
-  updateCliente, 
-  deleteCliente 
+import {
+  fetchClientes,
+  createCliente,
+  updateCliente,
+  deleteCliente,
 } from '../services/clienteService';
 import { ClienteModal } from '../components/ClienteModal';
 
@@ -17,7 +17,6 @@ export const ClientesPage = () => {
   const limit = parseInt(searchParams.get('limit') || '10', 10);
 
   const [clientes, setClientes] = useState([]);
-  const [allClientes, setAllClientes] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,7 +24,6 @@ export const ClientesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
 
-  // Cargar datos sin acumular o concatenar estados previos
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -33,11 +31,8 @@ export const ClientesPage = () => {
       const data = await fetchClientes({ search, status, page, limit });
       setClientes(data.clientes);
       setTotal(data.total);
-
-      const localData = JSON.parse(localStorage.getItem('enlasate_clientes') || '[]');
-      setAllClientes(localData);
     } catch (err) {
-      setError('Error al cargar clientes');
+      setError(err.message || 'Error al cargar clientes');
     } finally {
       setLoading(false);
     }
@@ -46,13 +41,6 @@ export const ClientesPage = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  // Cálculos dinámicos
-  const totalRegistrados = allClientes.length;
-  const clientesActivos = allClientes.filter(c => c.status === 'Activo').length;
-  const indiceActividad = totalRegistrados > 0 
-    ? ((clientesActivos / totalRegistrados) * 100).toFixed(1) 
-    : '0.0';
 
   const updateUrlParams = (newParams) => {
     const updated = new URLSearchParams(searchParams);
@@ -66,6 +54,7 @@ export const ClientesPage = () => {
   const handleSearchChange = (e) => updateUrlParams({ search: e.target.value, page: 1 });
   const handleStatusChange = (e) => updateUrlParams({ status: e.target.value, page: 1 });
   const handlePageChange = (newPage) => updateUrlParams({ page: newPage });
+  const handleLimitChange = (e) => updateUrlParams({ limit: e.target.value, page: 1 }); // NUEVO
 
   const handleOpenAdd = () => {
     setEditingCliente(null);
@@ -81,17 +70,20 @@ export const ClientesPage = () => {
     if (editingCliente) {
       if (!window.confirm('¿Deseas guardar los cambios?')) return;
       try {
-        await updateCliente(editingCliente.id, formData);
-        await loadData();
+        const updated = await updateCliente(editingCliente.id, formData);
+        // Reflejar en estado local con la respuesta de la API
+        setClientes((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
       } catch (err) {
-        alert('Error al actualizar cliente');
+        alert(err.message || 'Error al actualizar cliente');
       }
     } else {
       try {
-        await createCliente(formData);
-        await loadData();
+        const created = await createCliente(formData);
+        // Reflejar en estado local con la respuesta de la API
+        setClientes((prev) => [created, ...prev].slice(0, limit));
+        setTotal((prev) => prev + 1);
       } catch (err) {
-        alert('Error al registrar cliente');
+        alert(err.message || 'Error al registrar cliente');
       }
     }
   };
@@ -100,9 +92,11 @@ export const ClientesPage = () => {
     if (!window.confirm('¿Estás seguro de que deseas eliminar este cliente?')) return;
     try {
       await deleteCliente(id);
-      await loadData();
+      // Reflejar en estado local
+      setClientes((prev) => prev.filter((c) => c.id !== id));
+      setTotal((prev) => prev - 1);
     } catch (err) {
-      alert('Error al eliminar cliente');
+      alert(err.message || 'Error al eliminar cliente');
     }
   };
 
@@ -113,20 +107,20 @@ export const ClientesPage = () => {
       {/* TARJETAS DE MÉTRICAS */}
       <div style={figmaStyles.kpiGrid}>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>{totalRegistrados}</h2>
+          <h2 style={figmaStyles.kpiValue}>{total}</h2>
           <p style={figmaStyles.kpiLabel}>Clientes registrados</p>
         </div>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>{clientesActivos}</h2>
-          <p style={figmaStyles.kpiLabel}>Clientes activos</p>
+          <h2 style={figmaStyles.kpiValue}>{clientes.filter((c) => c.status === 'Activo').length}</h2>
+          <p style={figmaStyles.kpiLabel}>Clientes activos (página)</p>
         </div>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>{totalRegistrados}</h2>
-          <p style={figmaStyles.kpiLabel}>Registros este mes</p>
+          <h2 style={figmaStyles.kpiValue}>{limit}</h2>
+          <p style={figmaStyles.kpiLabel}>Registros por página</p>
         </div>
         <div style={figmaStyles.kpiCard}>
-          <h2 style={figmaStyles.kpiValue}>{indiceActividad}%</h2>
-          <p style={figmaStyles.kpiLabel}>Índice de actividad</p>
+          <h2 style={figmaStyles.kpiValue}>{page} / {totalPages}</h2>
+          <p style={figmaStyles.kpiLabel}>Página actual</p>
         </div>
       </div>
 
@@ -148,6 +142,14 @@ export const ClientesPage = () => {
             <option value="">Todos los estados</option>
             <option value="Activo">Activo</option>
             <option value="Inactivo">Inactivo</option>
+          </select>
+
+          {/* NUEVO: selector de límite */}
+          <select value={limit} onChange={handleLimitChange} style={figmaStyles.filterSelect}>
+            <option value={10}>10 por página</option>
+            <option value={20}>20 por página</option>
+            <option value={40}>40 por página</option>
+            <option value={50}>50 por página</option>
           </select>
 
           <button onClick={handleOpenAdd} style={figmaStyles.btnExport}>
@@ -197,16 +199,16 @@ export const ClientesPage = () => {
             </table>
 
             <div style={figmaStyles.pagination}>
-              <button 
-                onClick={() => handlePageChange(page - 1)} 
+              <button
+                onClick={() => handlePageChange(page - 1)}
                 disabled={page <= 1}
                 style={figmaStyles.pageBtn}
               >
                 Anterior
               </button>
               <span>Página {page} de {totalPages}</span>
-              <button 
-                onClick={() => handlePageChange(page + 1)} 
+              <button
+                onClick={() => handlePageChange(page + 1)}
                 disabled={page >= totalPages}
                 style={figmaStyles.pageBtn}
               >

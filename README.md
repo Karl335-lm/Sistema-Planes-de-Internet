@@ -1,16 +1,26 @@
-# React + Vite
+# t3_act8_eqXX - Sistema de Planes de Internet
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Integrantes
+- [Tu nombre completo] - Fases 1, 2 y 4
+- [Nombre de tu compañera] - Fase 3
 
-Currently, two official plugins are available:
+## API elegida
+**DummyJSON Users** - https://dummyjson.com/users
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Se eligió esta API porque el sistema es de gestión de clientes, y DummyJSON Users
+permite simular un directorio de clientes con paginación real (`limit`/`skip`),
+búsqueda (`q`) y operaciones CRUD (`POST/PUT/DELETE`).
 
-## React Compiler
+## Proyecto desplegado
+http://IP_DE_TU_VPS/t3_act8_eqXX
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tecnologías
+- React + Vite
+- React Router DOM
+- Lucide React (iconos)
+- DummyJSON (auth + users)
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Instalación local
+```bash
+npm install
+npm run dev
