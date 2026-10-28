@@ -1,5 +1,3 @@
-
-
 # Sistema de Planes de Internet
 
 Aplicación web desarrollada con React y Vite para la gestión de clientes de una empresa proveedora de servicios de Internet. El sistema permite consultar información, realizar búsquedas, filtrar registros y ejecutar operaciones CRUD mediante una API REST.
@@ -93,13 +91,13 @@ https://dummyjson.com/users?limit=10&skip=0
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/Karl335-lm/Sistema-Planes-de-Internet.git
+git clone https://github.com/Karl335-lm/t3_act8_eq16.git
 ```
 
 ### 2. Acceder al directorio del proyecto
 
 ```bash
-cd Sistema-Planes-de-Internet
+cd t3_act8_eq16
 ```
 
 ### 3. Instalar las dependencias
@@ -128,7 +126,23 @@ Si la aplicación se encuentra dentro de una subcarpeta, es necesario acceder pr
 
 Para el diseño visual se tomó como referencia el prototipo elaborado en Figma durante la actividad anterior. Se conservaron elementos como la pantalla de inicio de sesión, el menú lateral, la barra de navegación y la tabla principal de clientes.
 
-La interfaz se organizó mediante componentes reutilizables para facilitar el mantenimiento y la integración de las distintas funcionalidades.
+La interfaz se organizó mediante componentes reutilizables para facilitar el mantenimiento y la integración de las distintas funcionalidades, a continuación se muuestran diseños realizados en Figma.
+
+>Diseño Login
+
+![Pb1](figma_pruebas/login.png)
+
+>Inicio
+![Pb2](figma_pruebas/inicio.png)
+
+>Clientes
+![Pb3](figma_pruebas/clientes.png)
+
+>Reportes (aún en desarrollo)
+![Pb4](figma_pruebas/reportes.png)
+
+>Configuración
+![Pb5](figma_pruebas/configuracion.png)
 
 ## Resumen del desarrollo
 
@@ -172,7 +186,3 @@ Durante el desarrollo del proyecto se reforzaron los conocimientos relacionados 
 - Implementación de operaciones CRUD.
 - Compilación de aplicaciones con Vite.
 - Despliegue de aplicaciones web en AWS EC2 mediante Nginx.
-
-## Licencia
-
-Proyecto desarrollado con fines académicos.
